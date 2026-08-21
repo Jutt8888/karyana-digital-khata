@@ -1,1 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEW MULTANI KARYANA STORE - Digital Khata</title>
+  <style>
+    :root {
+      --primary: #15803d; /* Pakistani Emerald Green */
+      --danger: #dc2626;  /* Udhaar / Red */
+      --success: #16a34a; /* Wapsi / Green */
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #cbd5e1;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    
+    /* Natural Scrolling Page Layout */
+    body { 
+      background-color: var(--bg); 
+      color: var(--text); 
+      padding: 16px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 16px; 
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Store Header Banner */
+    .shop-header {
+      background: var(--primary);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .shop-header h1 { font-size: 1.4rem; letter-spacing: 0.5px; text-transform: uppercase; }
+    .shop-header p { font-size: 0.85rem; opacity: 0.9; }
+
+    /* Grand Total Summary Banner */
+    .summary-banner {
+      display: flex;
+    }
+    .summary-card {
+      width: 100%;
+      background: var(--card-bg);
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .summary-card span { font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; }
+    .summary-card h2 { font-size: 1.6rem; margin-top: 4px; }
+
+    /* Navigation Tabs */
+    .header-nav { display: flex; gap: 8px; border-bottom: 2px solid var(--border); padding-bottom: 6px; }
+    .tab-btn { padding: 8px 16px; font-weight: 600; border: none; background: transparent; cursor: pointer; color: #64748b; font-size: 0.95rem; border-radius: 6px; }
+    .tab-btn.active { background: var(--primary); color: white; }
+
+    /* Tab Content Views */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .full-grid { display: grid; grid-template-columns: 360px 1fr; gap: 16px; align-items: start; }
+    @media (max-width: 768px) { 
+      .full-grid { grid-template-columns: 1fr; } 
+    }
+
+    .card { background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+
+    h2, h3 { margin-bottom: 12px; }
+
+    .form-group { margin-bottom: 10px; }
+    label { display: block; margin-bottom: 4px; font-size: 0.85rem; font-weight: 600; }
+    input, select { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+
+    .btn-group { display: flex; gap: 8px; align-items: center; }
+    button { padding: 8px 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-secondary { background: #64748b; color: white; }
+    .btn-sm { padding: 4px 8px; font-size: 0.8rem; }
+
+    .customer-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .customer-item:hover { background-color: #f1f5f9; }
+    .customer-item.active { background-color: #f0fdf4; border-left: 4px solid var(--primary); }
+
+    .customer-table { width: 100%; border-collapse: collapse; }
+    .customer-table th, .customer-table td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+    .customer-table th { background: #f1f5f9; font-weight: 600; font-size: 0.9rem; }
+    .customer-table tr:hover { background: #f8fafc; }
+
+    .badge-gave { color: var(--danger); font-weight: bold; }
+    .badge-got { color: var(--success); font-weight: bold; }
+
+    /* Transaction Styling & Cleared Container */
+    .tx-item { 
+      padding: 12px; 
+      border: 1px solid var(--border); 
+      border-radius: 8px; 
+      margin-bottom: 8px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+    .tx-item:hover { background-color: #f8fafc; }
+    .tx-item.selected { border: 2px solid var(--primary); background-color: #f0fdf4; }
+    
+    /* Cleared Transaction Container Visual */
+    .tx-item.is-cleared { 
+      border: 2px solid var(--success) !important; 
+      background-color: #f0fdf4 !important; 
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+    }
+
+    .clear-badge {
+      display: inline-block;
+      background-color: var(--success);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      text-transform: uppercase;
+    }
+
+    .tx-date { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: white; padding: 20px; border-radius: 8px; width: 100%; max-width: 400px; }
+  </style>
+</head>
+<body>
+
+  <!-- SHOP HEADER -->
+  <div class="shop-header">
+    <div>
+      <h1>🛒 NEW MULTANI KARYANA STORE</h1>
+      <p>Digital Khata & Customer Ledger System</p>
+    </div>
+  </div>
+
+  <!-- GRAND TOTAL SUMMARY BANNER -->
+  <div class="summary-banner">
+    <div class="summary-card">
+      <span>Kul Udhaar (Total Receivable)</span>
+      <h2 id="grandTotalUdhaar" style="color: var(--danger);">Rs 0</h2>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <div class="header-nav">
+    <button class="tab-btn active" onclick="switchTab('ledgerTab', this)">📖 Khata Register</button>
+    <button class="tab-btn" onclick="switchTab('allCustomersTab', this)">👥 All Grahak List</button>
+  </div>
+
+  <!-- TAB 1: LEDGER VIEW -->
+  <div id="ledgerTab" class="tab-content active">
+    <div class="full-grid">
+      <!-- Left Sidebar Column -->
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="card">
+          <h3>➕ Naya Grahak Add Karein</h3>
+          <form id="addCustomerForm">
+            <div class="form-group">
+              <label>Customer Name *</label>
+              <input type="text" id="custName" required placeholder="e.g. Chaudhry Rashid">
+            </div>
+            <div class="form-group">
+              <label>Mobile / Phone Number</label>
+              <input type="text" id="custPhone" placeholder="03001234567">
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Add Grahak</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>👥 Customers / Khate</h3>
+          <div class="form-group">
+            <input type="text" id="searchCust" placeholder="🔍 Search grahak name or phone..." onkeyup="filterCustomers()">
+          </div>
+          <div id="customerList">Loading Khata list...</div>
+        </div>
+      </div>
+
+      <!-- Right Ledger Detail Column -->
+      <div class="card" id="detailPanel">
+        <p style="color: #64748b; text-align: center; margin: 40px auto;">Select a customer from the left list to view their Hisab / Ledger details.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: ALL CUSTOMERS VIEW -->
+  <div id="allCustomersTab" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3>Grahak Directory</h3>
+        <div style="font-weight: 600; color: #64748b;" id="totalCustomerCount">Total: 0</div>
+      </div>
+
+      <div class="form-group">
+        <input type="text" id="searchAllCust" placeholder="🔍 Search grahak by name or mobile..." onkeyup="filterAllCustomersTable()">
+      </div>
+
+      <div>
+        <table class="customer-table">
+          <thead>
+            <tr>
+              <th>Customer Name</th>
+              <th>Phone No</th>
+              <th>Net Balance</th>
+              <th>Khata Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="allCustomersTableBody">
+            <tr><td colspan="5" style="text-align:center;">Loading directory...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT CUSTOMER MODAL -->
+  <div class="modal" id="editCustomerModal">
+    <div class="modal-content">
+      <h3>Edit Grahak Info</h3>
+      <form id="editCustomerForm">
+        <input type="hidden" id="editCustId">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="editCustName" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="editCustPhone">
+        </div>
+        <div class="btn-group" style="justify-content: flex-end;">
+          <button type="button" class="btn-secondary" onclick="closeModal('editCustomerModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Update Info</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT TRANSACTION MODAL -->
+  <div class="modal" id="editTxModal">
+    <div class="modal-content">
+      <h3>Edit Entry / Entry Durust Karein</h3>
+      <form id="editTxForm">
+        <input type="hidden" id="editTxId">
+        <input type="hidden" id="editTxCustId">
+        <div class="form-group">
+          <label>Transaction Type</label>
+          <select id="editTxType">
+            <option value="GAVE">GAVE / Udhaar (Item Credit)</option>
+            <option value="GOT">GOT / Wapsi (Cash Received)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (Rs)</label>
+          <input type="number" id="editTxAmount" required min="1">
+        </div>
+        <div class="form-group">
+          <label>Date & Time (Optional)</label>
+          <input type="datetime-local" id="editTxDate">
+        </div>
+        <div class="form-group">
+          <label>Details / Tafseel</label>
+          <input type="text" id="editTxDetails">
+        </div>
+        <div class="btn-group" style="justify-content: flex-end;">
+          <button type="button" class="btn-secondary" onclick="closeModal('editTxModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Update Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = '/api';
+    let allCustomers = [];
+    let selectedCustomerId = null;
+    let selectedTxId = null;
+
+    window.onload = () => { loadCustomers(); };
+
+    function switchTab(tabId, btnElement) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      if (btnElement) {
+        btnElement.classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      }
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function formatDate(isoString) {
+      if (!isoString) return '';
+      const d = new Date(isoString);
+      return d.toLocaleDateString() + ' | ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function toDatetimeLocal(isoString) {
+      if (!isoString) return '';
+      const d = new Date(isoString);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      return d.toISOString().slice(0, 16);
+    }
+
+    async function loadCustomers() {
+      try {
+        const res = await fetch(`${API_URL}/customers`);
+        allCustomers = await res.json();
+        calculateGrandTotals(allCustomers);
+        renderCustomers(allCustomers);
+        renderAllCustomersTable(allCustomers);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function calculateGrandTotals(customers) {
+      let totalUdhaar = 0;
+
+      customers.forEach(c => {
+        if (c.balance > 0) {
+          totalUdhaar += c.balance;
+        }
+      });
+
+      document.getElementById('grandTotalUdhaar').innerText = `Rs ${totalUdhaar}`;
+    }
+
+    function renderCustomers(list) {
+      const container = document.getElementById('customerList');
+      if (list.length === 0) {
+        container.innerHTML = '<p style="padding: 8px;">No grahak found.</p>';
+        return;
+      }
+
+      container.innerHTML = list.map(c => `
+        <div class="customer-item ${selectedCustomerId === c.id ? 'active' : ''}" onclick="selectCustomer(${c.id})">
+          <div>
+            <strong>${escapeHtml(c.name)}</strong><br>
+            <small>${escapeHtml(c.phone || 'No Phone')}</small>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: bold; color: ${c.balance > 0 ? 'var(--danger)' : c.balance < 0 ? 'var(--success)' : 'inherit'}">
+              Rs ${c.balance}
+            </div>
+            <small style="color:#64748b">${c.balance > 0 ? 'Aap ne lene hain' : c.balance < 0 ? 'Aap ne dene hain' : 'Hisab Clear'}</small>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAllCustomersTable(list) {
+      const tbody = document.getElementById('allCustomersTableBody');
+      document.getElementById('totalCustomerCount').innerText = `Total: ${list.length}`;
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 16px;">No grahak found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(c => `
+        <tr>
+          <td><strong>${escapeHtml(c.name)}</strong></td>
+          <td>${escapeHtml(c.phone || '-')}</td>
+          <td style="font-weight: bold; color: ${c.balance > 0 ? 'var(--danger)' : c.balance < 0 ? 'var(--success)' : 'inherit'}">
+            Rs ${c.balance}
+          </td>
+          <td>
+            <span style="color:#64748b">${c.balance > 0 ? 'Udhaar Lene Hain' : c.balance < 0 ? 'Advance Cash Received' : 'Khata Clear'}</span>
+          </td>
+          <td>
+            <div class="btn-group">
+              <button class="btn-primary btn-sm" onclick="viewCustomerInLedger(${c.id})">View Khata</button>
+              <button class="btn-secondary btn-sm" onclick="openEditCustomerModal(${c.id}, '${escapeJs(c.name)}', '${escapeJs(c.phone)}')">Edit</button>
+              <button class="btn-danger btn-sm" onclick="deleteCustomer(${c.id})">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterCustomers() {
+      const q = document.getElementById('searchCust').value.toLowerCase();
+      const filtered = allCustomers.filter(c => c.name.toLowerCase().includes(q) || (c.phone && c.phone.includes(q)));
+      renderCustomers(filtered);
+    }
+
+    function filterAllCustomersTable() {
+      const q = document.getElementById('searchAllCust').value.toLowerCase();
+      const filtered = allCustomers.filter(c => c.name.toLowerCase().includes(q) || (c.phone && c.phone.includes(q)));
+      renderAllCustomersTable(filtered);
+    }
+
+    function viewCustomerInLedger(id) {
+      switchTab('ledgerTab', document.querySelectorAll('.tab-btn')[0]);
+      selectCustomer(id);
+    }
+
+    document.getElementById('addCustomerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+
+      const res = await fetch(`${API_URL}/customers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone })
+      });
+
+      if (res.ok) {
+        document.getElementById('custName').value = '';
+        document.getElementById('custPhone').value = '';
+        loadCustomers();
+      }
+    });
+
+    function selectCustomer(id) {
+      selectedCustomerId = id;
+      selectedTxId = null;
+      renderCustomers(allCustomers);
+      const customer = allCustomers.find(c => c.id === id);
+      if (!customer) return;
+
+      const detailPanel = document.getElementById('detailPanel');
+      detailPanel.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <h2>${escapeHtml(customer.name)}</h2>
+            <p><small>${escapeHtml(customer.phone || 'No Phone Number')}</small></p>
+          </div>
+          <div class="btn-group">
+            <button class="btn-secondary btn-sm" onclick="openEditCustomerModal(${customer.id}, '${escapeJs(customer.name)}', '${escapeJs(customer.phone)}')">Edit</button>
+            <button class="btn-danger btn-sm" onclick="deleteCustomer(${customer.id})">Delete Khata</button>
+          </div>
+        </div>
+
+        <div style="background:#f1f5f9; padding:10px 14px; border-radius:6px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+          <span>Net Balance / Kul Baqaya:</span>
+          <strong style="font-size:1.2rem; color:${customer.balance > 0 ? 'var(--danger)' : 'var(--success)'}">
+            Rs ${customer.balance}
+          </strong>
+        </div>
+
+        <form id="addTxForm" onsubmit="submitTransaction(event, ${customer.id})" style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:12px;">
+          <h4 style="margin-bottom:8px;">➕ Entry Darj Karein</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+            <select id="txType" required>
+              <option value="GAVE">GAVE (-) Udhaar / Sauda Diya</option>
+              <option value="GOT">GOT (+) Wapsi / Naqad Milay</option>
+            </select>
+            <input type="number" id="txAmount" placeholder="Amount (Rs)" required min="1">
+          </div>
+          <div style="margin-bottom:8px;">
+            <input type="datetime-local" id="txDate" placeholder="Date & Time (Optional)">
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="txDetails" placeholder="Saman ki tafseel (e.g. Atta, Chini, Gheen)">
+            <button type="submit" class="btn-primary">Save Entry</button>
+          </div>
+        </form>
+
+        <h3>Hisab History / Khata Details</h3>
+        <div id="txList">Loading transactions...</div>
+      `;
+
+      loadCustomerTransactions(id);
+    }
+
+    async function loadCustomerTransactions(id) {
+      const res = await fetch(`${API_URL}/customers/${id}/transactions`);
+      const history = await res.json();
+      const container = document.getElementById('txList');
+
+      if (history.length === 0) {
+        container.innerHTML = '<p style="color:#64748b; margin-top:8px;">Is grahak ka koi record nahi mila.</p>';
+        return;
+      }
+
+      container.innerHTML = history.map(tx => {
+        const isSelected = selectedTxId === tx.id;
+        const isCleared = tx.cleared || false;
+
+        return `
+          <div class="tx-item ${isSelected ? 'selected' : ''} ${isCleared ? 'is-cleared' : ''}" onclick="toggleSelectTx(${tx.id})">
+            <div>
+              <span class="${tx.type === 'GAVE' ? 'badge-gave' : 'badge-got'}">${tx.type === 'GAVE' ? 'Udhaar Diya' : 'GOT (Naqad)'}</span> 
+              <strong>Rs ${tx.amount}</strong>
+              ${isCleared ? '<span class="clear-badge">CLEAR</span>' : ''}
+              <div><small style="color:#64748b">${escapeHtml(tx.details || 'Tafseel nahi likhi')}</small></div>
+              <div class="tx-date">📅 ${formatDate(tx.created_at)}</div>
+            </div>
+            <div class="btn-group" onclick="event.stopPropagation()">
+              ${isSelected ? `
+                <button class="btn-success btn-sm" onclick="markPaymentClear(${tx.id}, ${tx.customer_id}, ${!isCleared})">
+                  ${isCleared ? 'Unmark Clear' : '✅ Payment Clear'}
+                </button>
+                <button class="btn-secondary btn-sm" onclick="openEditTxModal(${tx.id}, ${tx.customer_id}, '${tx.type}', ${tx.amount}, '${escapeJs(tx.details)}', '${tx.created_at}')">✏️ Edit</button>
+                <button class="btn-danger btn-sm" onclick="deleteTransaction(${tx.id}, ${tx.customer_id})">🗑️ Delete</button>
+              ` : `
+                <button class="btn-secondary btn-sm" onclick="toggleSelectTx(${tx.id})">Select</button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSelectTx(txId) {
+      selectedTxId = (selectedTxId === txId) ? null : txId;
+      if (selectedCustomerId) {
+        loadCustomerTransactions(selectedCustomerId);
+      }
+    }
+
+    async function markPaymentClear(txId, customerId, isClearStatus) {
+      const res = await fetch(`${API_URL}/transactions/${txId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cleared: isClearStatus })
+      });
+
+      if (res.ok) {
+        selectedTxId = null;
+        await loadCustomers();
+        selectCustomer(customerId);
+      }
+    }
+
+    async function submitTransaction(e, customerId) {
+      e.preventDefault();
+      const type = document.getElementById('txType').value;
+      const amount = Number(document.getElementById('txAmount').value);
+      const details = document.getElementById('txDetails').value.trim();
+      const created_at = document.getElementById('txDate').value || null;
+
+      const res = await fetch(`${API_URL}/transactions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_id: customerId, type, amount, details, created_at, cleared: false })
+      });
+
+      if (res.ok) {
+        await loadCustomers();
+        selectCustomer(customerId);
+      }
+    }
+
+    function openEditCustomerModal(id, name, phone) {
+      document.getElementById('editCustId').value = id;
+      document.getElementById('editCustName').value = name;
+      document.getElementById('editCustPhone').value = (phone === 'null' || !phone) ? '' : phone;
+      document.getElementById('editCustomerModal').style.display = 'flex';
+    }
+
+    document.getElementById('editCustomerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editCustId').value;
+      const name = document.getElementById('editCustName').value.trim();
+      const phone = document.getElementById('editCustPhone').value.trim();
+
+      const res = await fetch(`${API_URL}/customers/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone })
+      });
+
+      if (res.ok) {
+        closeModal('editCustomerModal');
+        await loadCustomers();
+        if (selectedCustomerId === Number(id)) {
+          selectCustomer(Number(id));
+        }
+      }
+    });
+
+    async function deleteCustomer(id) {
+      if (!confirm('Kya aap waqai is grahak aur unka pura khata delete karna chahte hain?')) return;
+
+      const res = await fetch(`${API_URL}/customers/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (res.ok) {
+        if (selectedCustomerId === id) {
+          selectedCustomerId = null;
+          document.getElementById('detailPanel').innerHTML = '<p style="color: #64748b; text-align: center; margin: 40px auto;">Select a customer from the left list.</p>';
+        }
+        loadCustomers();
+      } else {
+        alert('Delete Failed: ' + data.error);
+      }
+    }
+
+    function openEditTxModal(txId, custId, type, amount, details, createdAt) {
+      document.getElementById('editTxId').value = txId;
+      document.getElementById('editTxCustId').value = custId;
+      document.getElementById('editTxType').value = type;
+      document.getElementById('editTxAmount').value = amount;
+      document.getElementById('editTxDetails').value = (details === 'null' || !details) ? '' : details;
+      document.getElementById('editTxDate').value = toDatetimeLocal(createdAt);
+      document.getElementById('editTxModal').style.display = 'flex';
+    }
+
+    document.getElementById('editTxForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const txId = document.getElementById('editTxId').value;
+      const custId = document.getElementById('editTxCustId').value;
+      const type = document.getElementById('editTxType').value;
+      const amount = Number(document.getElementById('editTxAmount').value);
+      const details = document.getElementById('editTxDetails').value.trim();
+      const created_at = document.getElementById('editTxDate').value || null;
+
+      const res = await fetch(`${API_URL}/transactions/${txId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, amount, details, created_at })
+      });
+
+      if (res.ok) {
+        closeModal('editTxModal');
+        await loadCustomers();
+        selectCustomer(Number(custId));
+      }
+    });
+
+    async function deleteTransaction(txId, customerId) {
+      if (!confirm('Kya aap yeh entry delete karna chahte hain?')) return;
+
+      const res = await fetch(`${API_URL}/transactions/${txId}`, { method: 'DELETE' });
+
+      if (res.ok) {
+        await loadCustomers();
+        selectCustomer(customerId);
+      } else {
+        const err = await res.json();
+        alert('Delete Failed: ' + err.error);
+      }
+    }
+    async function markPaymentClear(txId, customerId, isClearStatus) {
+  try {
+    const res = await fetch(`${API_URL}/transactions/${txId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cleared: Boolean(isClearStatus) })
+    });
+
+    if (res.ok) {
+      // Retain active transaction selection state
+      selectedTxId = txId;
+      await loadCustomers();
+      selectCustomer(customerId);
+    } else {
+      const err = await res.json();
+      alert('Failed to update status: ' + (err.error || 'Server error'));
+    }
+  } catch (err) {
+    console.error('Clear payment request failed:', err);
+  }
+}
+
+    function escapeHtml(str) { return str ? String(str).replace(/[&<>'"]/g, '') : ''; }
+    function escapeJs(str) { return str ? String(str).replace(/'/g, "\\'") : ''; }
+  </script>
+</body>
+</html>
